@@ -1,0 +1,29 @@
+{
+  "id": "recipe_1757805580222_en5aq5tcd_6w04",
+  "name": "T2",
+  "created": "2025-09-13T23:19:40.222Z",
+  "source": "voice_assistant",
+  "metadata": {
+    "duration_seconds": 7,
+    "language": "en",
+    "session_id": "session_1757805580222_wmkvgdhe"
+  },
+  "ingredients": [
+    {
+      "name": "milk",
+      "amount": 100,
+      "unit": "milliliters",
+      "added_at": "2025-09-13T23:19:44.618Z"
+    }
+  ],
+  "instructions": [],
+  "nutrition": {
+    "estimated_calories": null,
+    "servings": null
+  },
+  "tags": [
+    "voice_created"
+  ],
+  "status": "completed",
+  "saved_at": "2025-09-13T23:19:47.405Z"
+}

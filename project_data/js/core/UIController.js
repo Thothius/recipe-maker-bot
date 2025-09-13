@@ -1,11 +1,11 @@
 // ============================================================================
-// UI CONTROLLER - View Management & User Interface
+// UI CONTROLLER - Orchestrates UI Sub-Modules
 // ============================================================================
-// Handles all UI-related functionality:
-// - View navigation and state management
-// - Typing effects and animations
-// - Modal management
-// - User interaction handling
+// Coordinates specialized UI modules:
+// - ViewManager: View navigation and state management
+// - AnimationManager: Typing effects and animations
+// - ModalManager: Modal management
+// - InteractionManager: User interaction handling
 // - Visual feedback and status updates
 // ============================================================================
 
@@ -13,48 +13,73 @@ class UIController {
     constructor() {
         console.log('🎨 UIController initializing...');
         
-        // View state
-        this.currentView = 'connect';
-        this.previousView = null;
-        
-        // Animation state
-        this.typingTimeout = null;
-        this.activeAnimations = new Map();
-        
-        // Modal state
-        this.activeModals = new Set();
-        
-        // User state
-        this.currentUser = null;
+        // Initialize sub-modules
+        this.viewManager = new ViewManager();
+        this.animationManager = new AnimationManager();
+        this.modalManager = new ModalManager();
+        this.interactionManager = new InteractionManager(
+            this.viewManager,
+            this.modalManager,
+            this.animationManager
+        );
         
         // Event callbacks
         this.onViewChange = null;
         this.onUserSelect = null;
         this.onError = null;
         
-        // Initialize DOM elements
+        // Initialize DOM elements and setup
         this.initializeElements();
-        this.setupEventListeners();
+        this.setupSubModules();
         this.setupUserProfile();
         
-        console.log('✅ UIController initialized');
+        // Start initial animations
+        this.startTaglineTypingEffect();
+        
+        console.log('✅ UIController initialized with sub-modules');
     }
     
     // ========================================================================
     // INITIALIZATION & SETUP
     // ========================================================================
     
+    setupSubModules() {
+        // Setup event handlers for sub-modules
+        this.viewManager.setEventHandlers({
+            onViewChange: (viewName, previousView) => {
+                this.handleViewChange(viewName, previousView);
+            }
+        });
+        
+        this.interactionManager.setEventHandlers({
+            onUserSelect: (username) => {
+                if (this.onUserSelect) {
+                    this.onUserSelect(username);
+                }
+            },
+            onRecipeAction: (action, source) => {
+                this.handleRecipeAction(action, source);
+            },
+            onError: (error) => {
+                if (this.onError) {
+                    this.onError(error);
+                }
+            }
+        });
+        
+        this.modalManager.setModalEventHandlers({
+            onModalShow: (modalName, data) => {
+                console.log('🔲 Modal shown:', modalName);
+            },
+            onModalHide: (modalName) => {
+                console.log('🔲 Modal hidden:', modalName);
+            }
+        });
+    }
+    
     setupUserProfile() {
         // Initialize user profile display
         this.updateUserProfileDisplay();
-        
-        // Setup radio button change handlers
-        const radioButtons = document.querySelectorAll('input[name="user-profile"]');
-        radioButtons.forEach(radio => {
-            radio.addEventListener('change', () => {
-                console.log('👤 User profile selection changed:', radio.value);
-            });
-        });
     }
     
     updateUserProfileDisplay() {
@@ -72,46 +97,6 @@ class UIController {
     }
     
     initializeElements() {
-        // Views with validation
-        this.views = {
-            connect: document.getElementById('connect-view'),
-            connected: document.getElementById('connected-view'),
-            recipeName: document.getElementById('recipe-name-view'),
-            recipeMain: document.getElementById('recipe-main-view'),
-            myRecipes: document.getElementById('my-recipes-view'),
-            settings: document.getElementById('settings-view'),
-            console: document.getElementById('console-view'),
-            inputTesting: document.getElementById('input-testing-view'),
-            userProfile: document.getElementById('user-profile-view')
-        };
-        
-        // Validate critical views exist
-        const criticalViews = ['connect', 'connected', 'recipeMain'];
-        criticalViews.forEach(viewName => {
-            if (!this.views[viewName]) {
-                console.error(`❌ Critical view missing: ${viewName}`);
-            }
-        });
-        
-        // Validate all views exist
-        Object.keys(this.views).forEach(viewName => {
-            if (!this.views[viewName]) {
-                console.error(`❌ View element missing: ${viewName}`);
-            } else {
-                console.log(`✅ View found: ${viewName}`);
-            }
-        });
-        
-        // User elements
-        this.userSelect = document.getElementById('user-select');
-        this.connectSection = document.getElementById('connect-section');
-        
-        // Typing effect elements
-        this.taglineText = document.getElementById('tagline-text');
-        this.taglineCursor = document.getElementById('tagline-cursor');
-        this.welcomeText = document.getElementById('welcome-text');
-        this.welcomeCursor = document.getElementById('welcome-cursor');
-        
         // Recipe elements
         this.recipeNameInput = document.getElementById('recipe-name-input');
         this.currentRecipeName = document.getElementById('current-recipe-name');
@@ -120,101 +105,19 @@ class UIController {
         this.saveRecipeActionBtn = document.getElementById('save-recipe-action-btn');
         this.closeRecipeActionBtn = document.getElementById('close-recipe-action-btn');
         
-        // Modals
-        this.modals = {
-            recipeCompletion: document.getElementById('recipeCompletion'),
-            'recipe-completion-modal': document.getElementById('recipe-completion-modal'),
-            recipeDetail: document.getElementById('recipe-detail-modal'),
-            confirmation: document.getElementById('confirmation-modal'),
-            about: document.getElementById('about-modal')
-        };
-        
         // Recipe grid
         this.recipesGrid = document.getElementById('recipes-grid');
         this.noRecipesMessage = document.getElementById('no-recipes-message');
         
-        console.log('📋 DOM elements initialized');
+        // Typing effect elements for initialization
+        this.taglineText = document.getElementById('tagline-text');
+        this.welcomeText = document.getElementById('welcome-text');
+        
+        console.log('📋 UIController DOM elements initialized');
     }
     
-    setupEventListeners() {
-        // User selection
-        if (this.userSelect) {
-            this.userSelect.addEventListener('change', (e) => {
-                const selectedUser = e.target.value;
-                if (selectedUser) {
-                    this.selectUser(selectedUser);
-                } else {
-                    this.clearUserSelection();
-                }
-            });
-        }
-        
-        // Navigation buttons
-        this.setupNavigationListeners();
-        
-        // Recipe flow buttons
-        this.setupRecipeFlowListeners();
-        
-        // Modal event listeners
-        this.setupModalListeners();
-        
-        // Start typing effects
-        this.startTaglineTypingEffect();
-        
-        console.log('🎯 Event listeners setup complete');
-    }
-    
-    // ========================================================================
-    // VIEW MANAGEMENT
-    // ========================================================================
-    
-    showView(viewName) {
-        if (!viewName || typeof viewName !== 'string') {
-            console.error('❌ Invalid view name provided:', viewName);
-            return;
-        }
-        
-        console.log(`📱 Switching to ${viewName} view`);
-        
-        // Hide all views with error handling
-        Object.values(this.views).forEach(view => {
-            if (view && view.classList) {
-                view.classList.add('hidden');
-            }
-        });
-        
-        // Show target view
-        const targetView = this.views[viewName];
-        if (targetView && targetView.classList) {
-            targetView.classList.remove('hidden');
-            this.previousView = this.currentView;
-            this.currentView = viewName;
-            
-            // Handle view-specific logic with error handling
-            try {
-                this.handleViewSpecificLogic(viewName);
-            } catch (error) {
-                console.error(`❌ Error in view-specific logic for ${viewName}:`, error);
-            }
-            
-            // Notify listeners with error handling
-            try {
-                if (this.onViewChange && typeof this.onViewChange === 'function') {
-                    this.onViewChange(viewName, this.previousView);
-                }
-            } catch (error) {
-                console.error('❌ Error in view change callback:', error);
-            }
-        } else {
-            console.error(`❌ View not found or invalid: ${viewName}`);
-            // Fallback to a safe view
-            if (viewName !== 'connect' && this.views.connect) {
-                this.showView('connect');
-            }
-        }
-    }
-    
-    handleViewSpecificLogic(viewName) {
+    handleViewChange(viewName, previousView) {
+        // Handle view-specific logic
         switch (viewName) {
             case 'connected':
                 this.startWelcomeTypingEffect();
@@ -232,14 +135,34 @@ class UIController {
                 this.initializeConsoleView();
                 break;
         }
+        
+        // Notify external listeners
+        if (this.onViewChange) {
+            this.onViewChange(viewName, previousView);
+        }
+    }
+    
+    handleRecipeAction(action, source) {
+        // Delegate recipe actions to main app
+        if (this.onViewChange) {
+            this.onViewChange(action, source);
+        }
+    }
+    
+    // ========================================================================
+    // VIEW MANAGEMENT (Delegated to ViewManager)
+    // ========================================================================
+    
+    showView(viewName) {
+        return this.viewManager.showView(viewName);
     }
     
     goBack() {
-        if (this.previousView) {
-            this.showView(this.previousView);
-        } else {
-            this.showView('connected');
-        }
+        return this.viewManager.goBack();
+    }
+    
+    getCurrentView() {
+        return this.viewManager.getCurrentView();
     }
     
     clearRecipeDisplay() {
@@ -313,256 +236,69 @@ class UIController {
     }
     
     // ========================================================================
-    // MODAL MANAGEMENT
+    // MODAL MANAGEMENT (Delegated to ModalManager)
     // ========================================================================
     
     showModal(modalName, data = null) {
-        console.log(`🔲 Showing modal: ${modalName}`);
-        
-        const modal = this.modals[modalName];
-        if (!modal) {
-            console.error(`❌ Modal not found: ${modalName}`);
-            return;
-        }
-        
-        // Setup modal content based on type and data
-        this.setupModalContent(modalName, data);
-        
-        // Show modal with animation
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-        
-        // For recipe completion modal, populate receipt-style data
+        // Handle recipe completion modal with special data population
         if (modalName === 'recipeCompletion' && data) {
             this.populateRecipeReceipt(data);
         }
-        
-        // Add to active modals set
-        this.activeModals.add(modalName);
-        
-        // Prevent body scroll
-        document.body.style.overflow = 'hidden';
-        
-        // Focus trap for accessibility
-        this.setupModalFocusTrap(modal);
+        return this.modalManager.showModal(modalName, data);
     }
     
     hideModal(modalName) {
-        console.log(`🔲 Hiding modal: ${modalName}`);
-        
-        const modal = this.modals[modalName];
-        if (!modal) {
-            console.error(`❌ Modal not found: ${modalName}`);
-            return;
-        }
-        
-        // Hide modal
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-        
-        // Remove from active modals set
-        this.activeModals.delete(modalName);
-        
-        // Restore body scroll if no other modals are open
-        if (this.activeModals.size === 0) {
-            document.body.style.overflow = '';
-        }
-        
-        // Clean up modal content
-        this.cleanupModalContent(modalName);
+        return this.modalManager.hideModal(modalName);
     }
     
     hideAllModals() {
-        console.log('🔲 Hiding all modals');
-        
-        this.activeModals.forEach(modalName => {
-            this.hideModal(modalName);
-        });
+        return this.modalManager.hideAllModals();
     }
     
-    setupModalContent(modalName, data) {
-        switch (modalName) {
-            case 'recipeCompletion':
-                this.setupRecipeCompletionModal(data);
-                break;
-                
-            case 'recipeDetail':
-                this.setupRecipeDetailModal(data);
-                break;
-                
-            case 'confirmation':
-                this.setupConfirmationModal(data);
-                break;
-                
-            case 'about':
-                this.setupAboutModal(data);
-                break;
-                
-            default:
-                console.log(`📋 No specific setup for modal: ${modalName}`);
-        }
-    }
-    
-    cleanupModalContent(modalName) {
-        // Clean up any modal-specific state or event listeners
-        switch (modalName) {
-            case 'recipeCompletion':
-                // Reset any completion modal state
-                break;
-                
-            case 'recipeDetail':
-                // Reset any detail modal state
-                break;
-                
-            default:
-                // Generic cleanup
-                break;
-        }
-    }
-    
-    setupModalFocusTrap(modal) {
-        // Simple focus trap implementation
-        const focusableElements = modal.querySelectorAll(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        
-        if (focusableElements.length > 0) {
-            focusableElements[0].focus();
-        }
-    }
-    
-    setupConfirmationModal(data) {
-        const modal = this.modals.confirmation;
-        if (!modal || !data) return;
-        
-        // Update confirmation modal with provided data
-        const titleElement = modal.querySelector('[data-modal-title]');
-        const messageElement = modal.querySelector('[data-modal-message]');
-        const confirmButton = modal.querySelector('[data-modal-confirm]');
-        const cancelButton = modal.querySelector('[data-modal-cancel]');
-        
-        if (titleElement && data.title) {
-            titleElement.textContent = data.title;
-        }
-        
-        if (messageElement && data.message) {
-            messageElement.textContent = data.message;
-        }
-        
-        if (confirmButton && data.onConfirm) {
-            confirmButton.onclick = () => {
-                data.onConfirm();
-                this.hideModal('confirmation');
-            };
-        }
-        
-        if (cancelButton && data.onCancel) {
-            cancelButton.onclick = () => {
-                data.onCancel();
-                this.hideModal('confirmation');
-            };
-        }
-    }
-    
-    setupAboutModal(data) {
-        const modal = this.modals.about;
-        if (!modal) return;
-        
-        // Setup about modal content
-        console.log('📋 Setting up about modal');
-    }
+    // Modal setup methods are now handled by ModalManager
+    // Keeping only recipe-specific modal population for backward compatibility
     
     // ========================================================================
-    // USER MANAGEMENT
+    // USER MANAGEMENT (Delegated to InteractionManager)
     // ========================================================================
     
     selectUser(username) {
-        console.log('👤 User selected:', username);
-        this.currentUser = username;
-        
-        // Show connect section with animation
-        if (this.connectSection) {
-            this.connectSection.classList.remove('opacity-0', 'invisible', 'translate-y-2');
-            this.connectSection.classList.add('opacity-100', 'visible', 'translate-y-0');
-        }
+        this.interactionManager.setCurrentUser(username);
         
         // Update welcome message if on connected view
-        if (this.currentView === 'connected') {
+        if (this.getCurrentView() === 'connected') {
             this.startWelcomeTypingEffect();
-        }
-        
-        if (this.onUserSelect) {
-            this.onUserSelect(username);
-        }
-    }
-    
-    clearUserSelection() {
-        console.log('👤 User selection cleared');
-        this.currentUser = null;
-        
-        // Hide connect section
-        if (this.connectSection) {
-            this.connectSection.classList.add('opacity-0', 'invisible', 'translate-y-2');
-            this.connectSection.classList.remove('opacity-100', 'visible', 'translate-y-0');
         }
     }
     
     getCurrentUser() {
-        return this.currentUser;
+        return this.interactionManager.getCurrentUser();
     }
     
     // ========================================================================
-    // TYPING EFFECTS
+    // TYPING EFFECTS (Delegated to AnimationManager)
     // ========================================================================
-    
-    startTypingEffect(element, text, speed = 50) {
-        if (!element || !text) return;
-        
-        // Clear any existing content and animations
-        element.textContent = '';
-        
-        if (this.typingTimeout) {
-            clearTimeout(this.typingTimeout);
-        }
-        
-        let i = 0;
-        const typeWriter = () => {
-            if (i < text.length && element) {
-                element.textContent += text.charAt(i);
-                i++;
-                this.typingTimeout = setTimeout(typeWriter, speed);
-            }
-        };
-        
-        this.typingTimeout = setTimeout(typeWriter, 50);
-    }
     
     startTaglineTypingEffect() {
         if (!this.taglineText) return;
         
         const text = "Voice-powered nutritional assistant";
-        this.startTypingEffect(this.taglineText, text, 30);
-        
-        // Show cursor after typing
-        setTimeout(() => {
-            if (this.taglineCursor) {
-                this.taglineCursor.style.display = 'inline';
-            }
-        }, text.length * 30 + 500);
+        this.animationManager.startTypingEffect(this.taglineText, text, 30);
     }
     
     startWelcomeTypingEffect() {
         if (!this.welcomeText) return;
         
+        const currentUser = this.getCurrentUser();
         let text;
-        if (this.currentUser) {
-            const capitalizedName = this.currentUser.charAt(0).toUpperCase() + this.currentUser.slice(1);
+        if (currentUser) {
+            const capitalizedName = currentUser.charAt(0).toUpperCase() + currentUser.slice(1);
             text = `Hello, ${capitalizedName}! Ready to create some recipes?`;
         } else {
             text = 'Welcome to Cookbooker. Please select a user to continue.';
         }
         
-        this.startTypingEffect(this.welcomeText, text, 50);
+        this.animationManager.startTypingEffect(this.welcomeText, text, 50);
     }
     
     // ========================================================================
@@ -586,17 +322,22 @@ class UIController {
     }
     
     updateIngredientsDisplay(ingredients) {
+        console.log('🔄 UIController.updateIngredientsDisplay called with:', ingredients);
+        
         if (!this.recipeIngredients) {
             console.warn('⚠️ Recipe ingredients element not found');
             return;
         }
         
         if (!ingredients || !Array.isArray(ingredients)) {
-            console.warn('⚠️ Invalid ingredients data provided');
+            console.warn('⚠️ Invalid ingredients data provided:', ingredients);
             return;
         }
         
+        console.log('📝 Updating ingredients display with', ingredients.length, 'ingredients');
+        
         if (ingredients.length === 0) {
+            console.log('📝 No ingredients - showing placeholder');
             this.recipeIngredients.innerHTML = '<div class="text-muted-foreground text-center py-8">Ingredients will appear here as you speak...</div>';
             return;
         }
@@ -701,50 +442,7 @@ class UIController {
         }
     }
     
-    // ========================================================================
-    // MODAL MANAGEMENT
-    // ========================================================================
-    
-    showModal(modalName, data = null) {
-        const modal = this.modals[modalName];
-        if (!modal) {
-            console.error(`❌ Modal not found: ${modalName}`);
-            return;
-        }
-        
-        modal.classList.remove('hidden');
-        this.activeModals.add(modalName);
-        
-        // Handle modal-specific setup
-        switch (modalName) {
-            case 'recipeCompletion':
-                this.setupRecipeCompletionModal(data);
-                break;
-            case 'recipe-completion-modal':
-                this.setupRecipeCompletionModal(data);
-                break;
-            case 'recipeDetail':
-                this.setupRecipeDetailModal(data);
-                break;
-        }
-        
-        console.log(`📋 Modal opened: ${modalName}`);
-    }
-    
-    hideModal(modalName) {
-        const modal = this.modals[modalName];
-        if (modal) {
-            modal.classList.add('hidden');
-            this.activeModals.delete(modalName);
-            console.log(`📋 Modal closed: ${modalName}`);
-        }
-    }
-    
-    hideAllModals() {
-        this.activeModals.forEach(modalName => {
-            this.hideModal(modalName);
-        });
-    }
+    // Duplicate modal management methods removed - now handled by ModalManager
     
     // ========================================================================
     // RECIPE DISPLAY
@@ -832,7 +530,7 @@ class UIController {
         
         // Add click event
         recipeCard.addEventListener('click', () => {
-            this.showModal('recipeDetail', recipe);
+            this.showModal('recipe-detail-modal', recipe);
         });
         
         return recipeCard;
@@ -852,27 +550,7 @@ class UIController {
     // ========================================================================
     
     showIngredientToast(ingredient) {
-        // Create toast notification
-        const toast = document.createElement('div');
-        toast.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-accent text-accent-foreground px-4 py-2 rounded-lg shadow-lg z-50 animate-slide-in';
-        toast.innerHTML = `
-            <div class="flex items-center space-x-2">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                </svg>
-                <span>Added ${ingredient.name}</span>
-            </div>
-        `;
-        
-        document.body.appendChild(toast);
-        
-        // Remove after 3 seconds
-        setTimeout(() => {
-            toast.classList.add('animate-slide-out');
-            setTimeout(() => {
-                document.body.removeChild(toast);
-            }, 300);
-        }, 3000);
+        this.showToast(`Added ${ingredient.name}`, 'success');
     }
     
     showErrorMessage(message) {
@@ -1009,209 +687,18 @@ class UIController {
         return true;
     }
     
-    // ========================================================================
-    // PRIVATE METHODS
-    // ========================================================================
-    
-    setupNavigationListeners() {
-        // Back buttons
-        const backButtons = [
-            { id: 'back-from-recipes', view: 'connected' },
-            { id: 'back-from-settings', view: 'connected' },
-            { id: 'back-from-console', view: 'connected' },
-            { id: 'back-from-recipe', view: 'connected' },
-            { id: 'back-to-connected', view: 'connected' },
-            { id: 'back-from-input-testing', view: 'connected' },
-            { id: 'back-from-user-profile', view: 'connected' }
-        ];
-        
-        backButtons.forEach(({ id, view }) => {
-            const button = document.getElementById(id);
-            if (button) {
-                button.addEventListener('click', async () => {
-                    // If leaving recipe view, disconnect voice
-                    if (id === 'back-from-recipe' || id === 'back-to-connected') {
-                        if (this.onViewChange && typeof this.onViewChange === 'function') {
-                            // Notify app to handle voice disconnection
-                            this.onViewChange('leaving-recipe', this.currentView);
-                        }
-                    }
-                    this.showView(view);
-                });
-            }
-        });
-        
-        // Menu buttons - map button IDs to view names
-        const menuButtons = [
-            { id: 'recipe-testing-btn', action: 'startRecipeFlow' },
-            { id: 'input-testing-btn', view: 'inputTesting' },
-            { id: 'my-recipes-btn', view: 'myRecipes' },
-            { id: 'user-profile-btn', view: 'userProfile' },
-            { id: 'save-user-profile', action: 'saveUserProfile' },
-            { id: 'connected-console-btn-bottom', view: 'console' },
-            { id: 'connected-settings-btn-bottom', view: 'settings' },
-            { id: 'settings-btn-recipes', view: 'settings' },
-            { id: 'console-btn', view: 'console' }
-        ];
-        
-        menuButtons.forEach(({ id, view, action }) => {
-            const button = document.getElementById(id);
-            if (button) {
-                console.log(`🔗 Setting up ${id} button for ${view || action}`);
-                button.addEventListener('click', () => {
-                    if (action && this.onViewChange && typeof this.onViewChange === 'function') {
-                        console.log(`🖱️ ${id} clicked, triggering action: ${action}`);
-                        this.onViewChange(action);
-                    } else if (view) {
-                        console.log(`🖱️ ${id} clicked, navigating to ${view}`);
-                        this.showView(view);
-                    }
-                });
-            } else {
-                console.warn(`⚠️ Button not found: ${id}`);
-            }
-        });
-    }
-    
-    setupRecipeFlowListeners() {
-        // Recipe name input
-        if (this.recipeNameInput) {
-            this.recipeNameInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    const startBtn = document.getElementById('start-recipe-btn');
-                    if (startBtn && !startBtn.disabled) {
-                        startBtn.click();
-                    }
-                }
-            });
-        }
-    }
-    
-    setupModalListeners() {
-        // Close buttons for all modals
-        Object.keys(this.modals).forEach(modalName => {
-            const modal = this.modals[modalName];
-            if (modal) {
-                // Close on overlay click
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
-                        this.hideModal(modalName);
-                    }
-                });
-                
-                // Close button
-                const closeBtn = modal.querySelector('[id*="close"]');
-                if (closeBtn) {
-                    closeBtn.addEventListener('click', () => this.hideModal(modalName));
-                }
-            }
-        });
-    }
+    // Event listener setup methods removed - now handled by InteractionManager
     
     setupRecipeCompletionModal(recipe) {
-        // Handle both modal types
-        const completionModal = this.modals['recipe-completion-modal'];
-        const savedModal = this.modals.recipeCompletion;
-        
-        if (completionModal) {
-            // Setup end recipe modal - simple confirmation
-            const closeBtn = completionModal.querySelector('#close-recipe-completion-modal');
-            if (closeBtn) {
-                closeBtn.onclick = () => this.hideModal('recipe-completion-modal');
-            }
-        }
-        
-        if (savedModal) {
-            // Setup saved recipe modal - simple confirmation
-            const closeBtn = savedModal.querySelector('#close-recipe-saved-modal');
-            if (closeBtn) {
-                closeBtn.onclick = () => this.hideModal('recipeCompletion');
-            }
-        }
+        // Modal setup is now handled by ModalManager
+        // This method kept for backward compatibility
+        console.log('📋 Recipe completion modal setup delegated to ModalManager');
     }
     
     setupRecipeDetailModal(recipe) {
-        const modal = this.modals.recipeDetail;
-        if (!modal || !recipe) return;
-        
-        console.log('📋 Setting up recipe detail modal for:', recipe.name, recipe);
-        
-        // Update recipe name
-        const nameElement = document.getElementById('detail-recipe-name');
-        if (nameElement) {
-            nameElement.textContent = recipe.name || 'Untitled Recipe';
-        }
-        
-        // Update created date
-        const createdElement = document.getElementById('detail-created-date');
-        if (createdElement) {
-            createdElement.textContent = recipe.created ? 
-                new Date(recipe.created).toLocaleDateString() : '-';
-        }
-        
-        // Update servings
-        const servingsElement = document.getElementById('detail-servings');
-        if (servingsElement) {
-            servingsElement.textContent = recipe.nutrition?.servings || '1-2';
-        }
-        
-        // Update ingredients list
-        const ingredientsList = document.getElementById('detail-ingredients-list');
-        if (ingredientsList && recipe.ingredients) {
-            ingredientsList.innerHTML = '';
-            recipe.ingredients.forEach(ingredient => {
-                const ingredientDiv = document.createElement('div');
-                ingredientDiv.className = 'flex justify-between items-center py-2 border-b border-border/50';
-                ingredientDiv.innerHTML = `
-                    <span class="text-foreground">${ingredient.name}</span>
-                    <span class="text-muted-foreground">${ingredient.amount} ${ingredient.unit}</span>
-                `;
-                ingredientsList.appendChild(ingredientDiv);
-            });
-        }
-        
-        // Update nutrition info if available
-        const nutritionSection = document.getElementById('detail-nutrition-section');
-        if (nutritionSection && recipe.nutrition) {
-            const calories = recipe.nutrition.estimated_calories || 
-                (recipe.ingredients ? recipe.ingredients.length * 150 : 0);
-            
-            const caloriesElement = document.getElementById('detail-calories');
-            if (caloriesElement) {
-                caloriesElement.textContent = `${calories} kcal`;
-            }
-            
-            // Show nutrition section if we have data
-            if (calories > 0) {
-                nutritionSection.classList.remove('hidden');
-            }
-        }
-        
-        // Setup delete button
-        const deleteBtn = document.getElementById('detail-delete-btn');
-        if (deleteBtn) {
-            // Remove any existing event listeners
-            deleteBtn.replaceWith(deleteBtn.cloneNode(true));
-            const newDeleteBtn = document.getElementById('detail-delete-btn');
-            
-            newDeleteBtn.addEventListener('click', async () => {
-                if (confirm(`Are you sure you want to delete "${recipe.name}"? This action cannot be undone.`)) {
-                    await this.deleteRecipe(recipe);
-                }
-            });
-        }
-        
-        // Setup close button
-        const closeBtn = document.getElementById('close-recipe-detail-modal');
-        if (closeBtn) {
-            // Remove any existing event listeners
-            closeBtn.replaceWith(closeBtn.cloneNode(true));
-            const newCloseBtn = document.getElementById('close-recipe-detail-modal');
-            
-            newCloseBtn.addEventListener('click', () => {
-                this.hideModal('recipeDetail');
-            });
-        }
+        // Modal setup is now handled by ModalManager
+        // This method kept for backward compatibility
+        console.log('📋 Recipe detail modal setup delegated to ModalManager');
     }
     
     async deleteRecipe(recipe) {
@@ -1249,7 +736,7 @@ class UIController {
             }
             
             // Close modal
-            this.hideModal('recipeDetail');
+            this.hideModal('recipe-detail-modal');
             
             // Show success message
             this.showToast(`Recipe "${recipe.name}" deleted successfully`, 'success');
@@ -1278,10 +765,6 @@ class UIController {
     // ========================================================================
     // PUBLIC API
     // ========================================================================
-    
-    getCurrentView() {
-        return this.currentView;
-    }
     
     setEventHandlers(handlers) {
         this.onViewChange = handlers.onViewChange;

@@ -184,7 +184,7 @@ class RecipeManager {
     
     removeIngredient(name) {
         const index = this.currentRecipe.ingredients.findIndex(
-            ing => ing.name === name.toLowerCase().trim()
+            ing => ing.name.toLowerCase() === name.toLowerCase().trim()
         );
         
         if (index >= 0) {
@@ -198,12 +198,17 @@ class RecipeManager {
     
     updateIngredient(name, newAmount, newUnit) {
         const ingredient = this.currentRecipe.ingredients.find(
-            ing => ing.name === name.toLowerCase().trim()
+            ing => ing.name.toLowerCase() === name.toLowerCase().trim()
         );
         
         if (ingredient) {
-            ingredient.amount = parseFloat(newAmount);
-            ingredient.unit = newUnit.toLowerCase().trim();
+            if (newAmount && !isNaN(parseFloat(newAmount))) {
+                ingredient.amount = parseFloat(newAmount);
+            }
+            if (newUnit && typeof newUnit === 'string') {
+                ingredient.unit = newUnit.toLowerCase().trim();
+            }
+            ingredient.updated_at = new Date().toISOString();
             console.log('✏️ Updated ingredient:', ingredient);
             return ingredient;
         }
@@ -288,33 +293,47 @@ class RecipeManager {
                         ingredient: success ? { name: args.name, amount: args.amount, unit: args.unit } : null
                     };
                     
-                case 'endRecipe':
-                    console.log('🔍 Current recipe state for endRecipe:', this.recipeState);
-                    
-                    // If no ingredients, just show empty modal
-                    if (this.currentRecipe.ingredients.length === 0) {
-                        console.log('🔄 No ingredients found, showing empty recipe modal');
-                        return { 
-                            success: true, 
-                            message: 'Recipe session ended',
-                            showModal: true,
-                            recipe: { name: 'Empty Recipe', ingredients: [] }
-                        };
+                case 'editIngredient':
+                case 'changeIngredient':
+                    if (this.recipeState !== 'listening_for_ingredients') {
+                        return { success: false, message: 'Not currently collecting ingredients' };
                     }
                     
-                    // Always show the modal regardless of state
-                    console.log('🎯 Showing recipe completion modal');
-                    const recipe = {
-                        name: this.currentRecipe.name || 'Untitled Recipe',
-                        ingredients: [...this.currentRecipe.ingredients]
-                    };
+                    if (!args.name || args.name.trim() === '') {
+                        return { success: false, message: 'Ingredient name is required for editing' };
+                    }
                     
-                    return { 
-                        success: true, 
-                        message: 'Recipe completed', 
-                        showModal: true,
-                        recipe 
-                    };
+                    const updatedIngredient = this.updateIngredient(args.name, args.amount, args.unit);
+                    if (updatedIngredient) {
+                        return { 
+                            success: true, 
+                            message: `Updated ${args.name} to ${args.amount} ${args.unit || 'pieces'}`,
+                            ingredient: updatedIngredient
+                        };
+                    } else {
+                        return { success: false, message: `Ingredient '${args.name}' not found` };
+                    }
+                    
+                case 'removeIngredient':
+                case 'deleteIngredient':
+                    if (this.recipeState !== 'listening_for_ingredients') {
+                        return { success: false, message: 'Not currently collecting ingredients' };
+                    }
+                    
+                    if (!args.name || args.name.trim() === '') {
+                        return { success: false, message: 'Ingredient name is required for removal' };
+                    }
+                    
+                    const removedIngredient = this.removeIngredient(args.name);
+                    if (removedIngredient) {
+                        return { 
+                            success: true, 
+                            message: `Removed ${removedIngredient.name}`,
+                            ingredient: removedIngredient
+                        };
+                    } else {
+                        return { success: false, message: `Ingredient '${args.name}' not found` };
+                    }
                     
                 case 'closeRecipe':
                     console.log('🚪 Closing recipe and returning to main menu');

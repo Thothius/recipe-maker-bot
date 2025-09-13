@@ -1,0 +1,29 @@
+{
+  "id": "recipe_1757805411442_1cgbpffku_p6gf",
+  "name": "Test",
+  "created": "2025-09-13T23:16:51.442Z",
+  "source": "voice_assistant",
+  "metadata": {
+    "duration_seconds": 7,
+    "language": "en",
+    "session_id": "session_1757805411442_p8loqk1q"
+  },
+  "ingredients": [
+    {
+      "name": "lemon",
+      "amount": 1,
+      "unit": "items",
+      "added_at": "2025-09-13T23:16:55.060Z"
+    }
+  ],
+  "instructions": [],
+  "nutrition": {
+    "estimated_calories": null,
+    "servings": null
+  },
+  "tags": [
+    "voice_created"
+  ],
+  "status": "completed",
+  "saved_at": "2025-09-13T23:16:58.448Z"
+}
