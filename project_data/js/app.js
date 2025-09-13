@@ -12,12 +12,18 @@ class RecipeVoiceApp {
     constructor() {
         console.log('🏗️ RecipeVoiceApp initializing with modular architecture...');
         
+        // Initialize configuration
+        this.voiceCommands = new VoiceCommands();
+        
         // Initialize core components
         this.userManager = new UserManager();
         this.apiClient = new APIClient();
         this.voiceManager = new VoiceManager();
         this.recipeManager = new RecipeManager();
         this.uiController = new UIController();
+        
+        // Initialize function router
+        this.functionRouter = new FunctionRouter(this.recipeManager, this.uiController);
         
         // Application state
         this.isInitialized = false;
@@ -474,80 +480,11 @@ class RecipeVoiceApp {
     // Configure voice session with OpenAI Realtime API
     configureVoiceSession() {
         console.log('🎛️ Configuring voice session with voice:', this.selectedVoice || 'sage');
-        this.voiceManager.updateSession({
-            modalities: ['text', 'audio'],
-            instructions: `You are a professional recipe recording robot. You ONLY respond to actual ingredient mentions.
-
-=== CORE BEHAVIOR ===
-- Be completely silent - no greetings, acknowledgments, or responses
-- ONLY call addIngredient when user mentions actual food ingredients with amounts
-- IGNORE greetings, hellos, casual conversation, and non-ingredient speech
-- Do NOT respond to "hello", "hi", "how are you", or casual conversation
-
-=== FUNCTION CALLING RULES ===
-- ONLY call addIngredient for actual food ingredients with clear amounts
-- Do NOT call functions for greetings or casual speech
-- Require clear ingredient + amount pattern: "[amount] [unit] [ingredient]"
-- If unclear or not a real ingredient, do NOT call any function
-
-=== INGREDIENT RECOGNITION ===
-ONLY recognize clear patterns like:
-- "2 cups flour" → addIngredient(flour, 2, cups)
-- "250 grams butter" → addIngredient(butter, 250, grams)
-- "3 eggs" → addIngredient(eggs, 3, items)
-DO NOT respond to: "hello", "hi", "how are you", casual conversation
-
-=== VOICE COMMANDS ===
-- "end recipe" → Call: endRecipe()
-- "save recipe" → Call: saveRecipe()
-- "close recipe" → Call: closeRecipe()
-
-Be silent, capture everything, call functions immediately.`,
-            voice: this.selectedVoice || 'sage',
-            input_audio_format: 'pcm16',
-            output_audio_format: 'pcm16',
-            input_audio_transcription: { model: 'whisper-1' },
-            turn_detection: {
-                type: 'server_vad',
-                threshold: 0.5,
-                prefix_padding_ms: 500,
-                silence_duration_ms: 1200
-            },
-            tools: [
-                {
-                    type: 'function',
-                    name: 'addIngredient',
-                    description: 'Add an ingredient to the current recipe',
-                    parameters: {
-                        type: 'object',
-                        properties: {
-                            name: { type: 'string', description: 'Name of the ingredient' },
-                            amount: { type: 'number', description: 'Amount/quantity of the ingredient' },
-                            unit: { type: 'string', description: 'Unit of measurement (grams, ml, cups, etc.)' }
-                        },
-                        required: ['name', 'amount', 'unit']
-                    }
-                },
-                {
-                    type: 'function',
-                    name: 'endRecipe',
-                    description: 'End the current recipe and show completion modal',
-                    parameters: { type: 'object', properties: {} }
-                },
-                {
-                    type: 'function',
-                    name: 'saveRecipe',
-                    description: 'Save the current recipe with nutrition analysis',
-                    parameters: { type: 'object', properties: {} }
-                },
-                {
-                    type: 'function',
-                    name: 'closeRecipe',
-                    description: 'Close the current recipe and return to main menu',
-                    parameters: { type: 'object', properties: {} }
-                }
-            ]
-        });
+        
+        // Create session configuration using VoiceCommands module
+        const sessionConfig = this.voiceCommands.getSessionConfig(this.selectedVoice);
+        
+        this.voiceManager.updateSession(sessionConfig);
     }
 
     // Handle function call results from OpenAI Realtime API
@@ -555,12 +492,12 @@ Be silent, capture everything, call functions immediately.`,
         try {
             console.log('🔧 Function call result received:', event);
             
-            // Process the function call through RecipeManager
-            const result = this.recipeManager.handleFunctionCall(event);
+            // Process the function call through FunctionRouter
+            const result = this.functionRouter.route(event);
             
             if (result && result.showModal) {
                 // Show modal if requested by function call result
-                this.uiController.showModal('recipe-completion-modal');
+                this.uiController.showModal('recipeCompletion');
             }
             
             // Update UI with any changes
@@ -575,9 +512,13 @@ Be silent, capture everything, call functions immediately.`,
     updateRecipeDisplay() {
         try {
             const currentRecipe = this.recipeManager.getCurrentRecipe();
-            if (currentRecipe && currentRecipe.ingredients.length > 0) {
-                // Update ingredients display
-                this.uiController.updateIngredientsDisplay(currentRecipe.ingredients);
+            console.log('🔄 Updating recipe display. Current recipe:', currentRecipe);
+            
+            if (currentRecipe) {
+                // Always update ingredients display, even if empty
+                this.uiController.updateIngredientsDisplay(currentRecipe.ingredients || []);
+            } else {
+                console.warn('⚠️ No current recipe found for display update');
             }
         } catch (error) {
             console.error('❌ Error updating recipe display:', error);
@@ -618,7 +559,7 @@ Be silent, capture everything, call functions immediately.`,
             
             if (result.success) {
                 console.log('✅ Recipe saved successfully:', result.filename);
-                this.uiController.showModal('recipe-completion-modal', currentRecipe);
+                this.uiController.showModal('recipeCompletion', currentRecipe);
                 
                 // Show success message
                 this.uiController.showSuccessMessage(`Recipe "${currentRecipe.name}" saved successfully!`);
@@ -701,7 +642,7 @@ Be silent, capture everything, call functions immediately.`,
     
     showAboutModal() {
         try {
-            this.uiController.showModal('about');
+            this.uiController.showModal('about-modal');
         } catch (error) {
             console.error('❌ Failed to show about modal:', error);
             // Fallback to direct DOM manipulation
@@ -714,7 +655,7 @@ Be silent, capture everything, call functions immediately.`,
     
     hideAboutModal() {
         try {
-            this.uiController.hideModal('about');
+            this.uiController.hideModal('about-modal');
         } catch (error) {
             console.error('❌ Failed to hide about modal:', error);
             // Fallback to direct DOM manipulation
@@ -784,6 +725,12 @@ Be silent, capture everything, call functions immediately.`,
         try {
             const args = JSON.parse(this.streamingFunctionCall.arguments);
             
+            // Validate arguments before processing
+            if (this.shouldSkipIncompleteCall(functionName, args)) {
+                console.log('⏭️ Skipping incomplete function call:', functionName, args);
+                return;
+            }
+            
             // Create a properly formatted function call event
             const functionCallEvent = {
                 type: 'function_call',
@@ -801,6 +748,22 @@ Be silent, capture everything, call functions immediately.`,
         
         // Reset for next function call
         this.streamingFunctionCall = null;
+    }
+    
+    shouldSkipIncompleteCall(functionName, args) {
+        // Skip calls that are likely incomplete based on function requirements
+        switch (functionName) {
+            case 'removeIngredient':
+            case 'deleteIngredient':
+                return !args.name || args.name.trim() === '';
+            case 'editIngredient':
+            case 'changeIngredient':
+                return !args.name || args.name.trim() === '';
+            case 'addIngredient':
+                return !args.name || args.name.trim() === '' || (!args.amount && !args.quantity);
+            default:
+                return false;
+        }
     }
     
     // ========================================================================
@@ -928,23 +891,26 @@ Be silent, capture everything, call functions immediately.`,
                 return;
             }
             
-            // Let RecipeManager handle the function call with error handling
-            const result = this.recipeManager.handleFunctionCall(functionCall);
+            // Let FunctionRouter handle the function call with error handling
+            const result = this.functionRouter.route(functionCall);
             
             // Handle both sync and async results
             Promise.resolve(result).then(resolvedResult => {
                 if (resolvedResult && resolvedResult.success) {
                     console.log('✅ Function call executed successfully:', resolvedResult.message);
                     
-                    // Update UI for ingredient additions
-                    if (functionCall.name === 'addIngredient') {
+                    // Always update UI for ingredient operations
+                    this.updateRecipeDisplay();
+                    
+                    // Update UI if explicitly requested
+                    if (resolvedResult.updateUI) {
                         this.updateRecipeDisplay();
                     }
                     
-                    // Show modal if requested (for endRecipe)
-                    if (resolvedResult.showModal && resolvedResult.recipe) {
-                        console.log('🎯 Showing recipe completion modal from function result');
-                        this.uiController.showModal('recipe-completion-modal', resolvedResult.recipe);
+                    // Handle recipe closure
+                    if (resolvedResult.closeRecipe) {
+                        console.log('🚪 Closing recipe and returning to main menu');
+                        this.returnToMainMenu();
                     }
                     
                     // Handle close recipe action
@@ -955,14 +921,14 @@ Be silent, capture everything, call functions immediately.`,
                     }
                     
                     // Only show UI feedback for critical actions, not ingredient additions
-                    if (functionCall.name === 'saveRecipe' || functionCall.name === 'endRecipe' || functionCall.name === 'closeRecipe') {
+                    if (functionCall.name === 'saveRecipe' || functionCall.name === 'closeRecipe' || functionCall.name === 'editIngredient' || functionCall.name === 'removeIngredient') {
                         this.uiController.showSuccessMessage(resolvedResult.message);
                     }
                 } else {
                     console.log('❌ Function call failed:', resolvedResult.message);
                     
                     // Only show error messages for critical failures, not ingredient parsing issues
-                    if (functionCall.name === 'saveRecipe' || functionCall.name === 'endRecipe') {
+                    if (functionCall.name === 'saveRecipe' || functionCall.name === 'editIngredient' || functionCall.name === 'removeIngredient') {
                         this.uiController.showErrorMessage(`Action failed: ${resolvedResult.message}`);
                     }
                 }

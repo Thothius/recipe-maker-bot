@@ -1,0 +1,29 @@
+{
+  "id": "recipe_1757805259540_bxhq8r67w_qzin",
+  "name": "Test",
+  "created": "2025-09-13T23:14:19.540Z",
+  "source": "voice_assistant",
+  "metadata": {
+    "duration_seconds": 19,
+    "language": "en",
+    "session_id": "session_1757805259540_vmnnteq7"
+  },
+  "ingredients": [
+    {
+      "name": "water",
+      "amount": 100,
+      "unit": "ml",
+      "added_at": "2025-09-13T23:14:33.770Z"
+    }
+  ],
+  "instructions": [],
+  "nutrition": {
+    "estimated_calories": null,
+    "servings": null
+  },
+  "tags": [
+    "voice_created"
+  ],
+  "status": "completed",
+  "saved_at": "2025-09-13T23:14:38.620Z"
+}

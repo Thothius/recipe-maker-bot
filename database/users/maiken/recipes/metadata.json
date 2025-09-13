@@ -49,16 +49,16 @@
       "user": "maiken"
     },
     {
-      "id": "recipe_1757791144176_14js202xz_iwex",
-      "name": "Capybara Soup",
-      "filename": "recipe_2025-09-13T19192.json",
-      "created": "2025-09-13T19:19:04.176Z",
+      "id": "recipe_1757805580222_en5aq5tcd_6w04",
+      "name": "T2",
+      "filename": "recipe_2025-09-13T23194.json",
+      "created": "2025-09-13T23:19:40.222Z",
       "ingredients": [
         {
-          "name": "potatoes",
-          "amount": 200,
-          "unit": "grams",
-          "added_at": "2025-09-13T19:19:16.048Z"
+          "name": "milk",
+          "amount": 100,
+          "unit": "milliliters",
+          "added_at": "2025-09-13T23:19:44.618Z"
         }
       ],
       "tags": [
