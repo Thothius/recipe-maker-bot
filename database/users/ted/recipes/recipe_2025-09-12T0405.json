@@ -1,0 +1,52 @@
+{
+  "id": "recipe_2025-09-12T0405",
+  "name": "Potato Pie",
+  "created": "2025-09-12T04:05:09.958Z",
+  "source": "voice_assistant",
+  "metadata": {
+    "duration_seconds": 112,
+    "language": "en",
+    "session_id": "sess_ylfz7zs2j"
+  },
+  "ingredients": [
+    {
+      "id": "ing_1757649929068_imvka",
+      "name": "potatoes",
+      "amount": 100,
+      "unit": "grams",
+      "added_at": "2025-09-12T04:05:29.068Z"
+    }
+  ],
+  "instructions": [],
+  "nutrition": {
+    "total_calories": 50,
+    "protein_g": 2,
+    "carbohydrates_g": 6,
+    "fat_g": 2,
+    "fiber_g": 5,
+    "sugar_g": 1,
+    "sodium_mg": 500,
+    "estimated_servings": 1,
+    "per_serving": {
+      "calories": 50,
+      "protein_g": 2,
+      "carbohydrates_g": 6,
+      "fat_g": 2
+    },
+    "daily_values_per_serving": {
+      "protein_percent": 4,
+      "carbs_percent": 2,
+      "fat_percent": 3,
+      "fiber_percent": 8
+    },
+    "health_notes": [
+      "Nutritional values are estimated",
+      "Consult a nutritionist for precise dietary planning"
+    ],
+    "analysis_method": "fallback_estimation"
+  },
+  "tags": [
+    "voice_created"
+  ],
+  "status": "completed"
+}

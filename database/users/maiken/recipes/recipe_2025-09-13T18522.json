@@ -1,0 +1,59 @@
+{
+  "id": "recipe_1757789477149_n4pymgun1_r7qv",
+  "name": "Shepard's Pie",
+  "created": "2025-09-13T18:51:17.149Z",
+  "source": "voice_assistant",
+  "metadata": {
+    "duration_seconds": 69,
+    "language": "en",
+    "session_id": "session_1757789477149_nuaok144"
+  },
+  "ingredients": [
+    {
+      "name": "parsley",
+      "amount": 15,
+      "unit": "grams",
+      "added_at": "2025-09-13T18:51:25.084Z"
+    },
+    {
+      "name": "rosemary",
+      "amount": 10,
+      "unit": "grams",
+      "added_at": "2025-09-13T18:51:31.391Z"
+    },
+    {
+      "name": "salt",
+      "amount": 5,
+      "unit": "grams",
+      "added_at": "2025-09-13T18:51:37.378Z"
+    },
+    {
+      "name": "pepper",
+      "amount": 15,
+      "unit": "grams",
+      "added_at": "2025-09-13T18:51:42.159Z"
+    },
+    {
+      "name": "water",
+      "amount": 500,
+      "unit": "ml",
+      "added_at": "2025-09-13T18:51:48.455Z"
+    },
+    {
+      "name": "meat",
+      "amount": 500,
+      "unit": "grams",
+      "added_at": "2025-09-13T18:52:01.997Z"
+    }
+  ],
+  "instructions": [],
+  "nutrition": {
+    "estimated_calories": null,
+    "servings": null
+  },
+  "tags": [
+    "voice_created"
+  ],
+  "status": "completed",
+  "saved_at": "2025-09-13T18:52:26.520Z"
+}

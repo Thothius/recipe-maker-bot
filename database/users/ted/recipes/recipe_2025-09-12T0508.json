@@ -1,0 +1,66 @@
+{
+  "id": "recipe_2025-09-12T0508",
+  "name": "Shepard's Pie",
+  "created": "2025-09-12T05:08:48.023Z",
+  "source": "voice_assistant",
+  "metadata": {
+    "duration_seconds": 85,
+    "language": "en",
+    "session_id": "sess_nzgb8c6h4"
+  },
+  "ingredients": [
+    {
+      "id": "ing_1757653751561_syku5",
+      "name": "potato",
+      "amount": 1400,
+      "unit": "grams",
+      "added_at": "2025-09-12T05:09:11.561Z"
+    },
+    {
+      "id": "ing_1757653758745_yfuhe",
+      "name": "water",
+      "amount": 100,
+      "unit": "grams",
+      "added_at": "2025-09-12T05:09:18.745Z"
+    },
+    {
+      "id": "ing_1757653772459_9cc5a",
+      "name": "duck",
+      "amount": 900,
+      "unit": "grams",
+      "added_at": "2025-09-12T05:09:32.459Z"
+    }
+  ],
+  "instructions": [],
+  "nutrition": {
+    "total_calories": 1200,
+    "protein_g": 45,
+    "carbohydrates_g": 150,
+    "fat_g": 47,
+    "fiber_g": 6,
+    "sugar_g": 30,
+    "sodium_mg": 500,
+    "estimated_servings": 1,
+    "per_serving": {
+      "calories": 1200,
+      "protein_g": 45,
+      "carbohydrates_g": 150,
+      "fat_g": 47
+    },
+    "daily_values_per_serving": {
+      "protein_percent": 90,
+      "carbs_percent": 50,
+      "fat_percent": 72,
+      "fiber_percent": 24
+    },
+    "health_notes": [
+      "Nutritional values are estimated",
+      "Consult a nutritionist for precise dietary planning"
+    ],
+    "analysis_method": "fallback_estimation"
+  },
+  "tags": [
+    "voice_created"
+  ],
+  "status": "completed"
+}

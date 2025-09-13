@@ -1,0 +1,29 @@
+{
+  "id": "recipe_1757783697765_jlu4x9oxq_fc4m",
+  "name": "Test",
+  "created": "2025-09-13T17:14:57.765Z",
+  "source": "voice_assistant",
+  "metadata": {
+    "duration_seconds": 13,
+    "language": "en",
+    "session_id": "session_1757783697765_1bkj4dlx"
+  },
+  "ingredients": [
+    {
+      "name": "potatoes",
+      "amount": 100,
+      "unit": "grams",
+      "added_at": "2025-09-13T17:15:01.806Z"
+    }
+  ],
+  "instructions": [],
+  "nutrition": {
+    "estimated_calories": null,
+    "servings": null
+  },
+  "tags": [
+    "voice_created"
+  ],
+  "status": "completed",
+  "saved_at": "2025-09-13T17:15:11.348Z"
+}

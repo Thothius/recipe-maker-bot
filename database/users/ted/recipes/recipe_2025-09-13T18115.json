@@ -1,0 +1,35 @@
+{
+  "id": "recipe_1757787092143_ufahmr7zb_qh6z",
+  "name": "Test 1",
+  "created": "2025-09-13T18:11:32.143Z",
+  "source": "voice_assistant",
+  "metadata": {
+    "duration_seconds": 22,
+    "language": "en",
+    "session_id": "session_1757787092143_8mzzgt10"
+  },
+  "ingredients": [
+    {
+      "name": "sugar",
+      "amount": 250,
+      "unit": "grams",
+      "added_at": "2025-09-13T18:11:35.913Z"
+    },
+    {
+      "name": "butter",
+      "amount": 100,
+      "unit": "grams",
+      "added_at": "2025-09-13T18:11:39.679Z"
+    }
+  ],
+  "instructions": [],
+  "nutrition": {
+    "estimated_calories": null,
+    "servings": null
+  },
+  "tags": [
+    "voice_created"
+  ],
+  "status": "completed",
+  "saved_at": "2025-09-13T18:11:54.675Z"
+}

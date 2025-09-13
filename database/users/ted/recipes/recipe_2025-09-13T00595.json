@@ -1,0 +1,60 @@
+{
+  "id": "recipe_1757725124153_wh9t437pr_kpg8",
+  "name": "Potato Dish",
+  "created": "2025-09-13T00:58:44.153Z",
+  "source": "voice_assistant",
+  "metadata": {
+    "duration_seconds": 68,
+    "language": "en",
+    "session_id": "session_1757725124153_ue3n0ipt"
+  },
+  "ingredients": [
+    {
+      "name": "potatoes",
+      "amount": 100,
+      "unit": "grams",
+      "added_at": "2025-09-13T00:58:52.315Z"
+    },
+    {
+      "name": "salt",
+      "amount": 50,
+      "unit": "grams",
+      "added_at": "2025-09-13T00:59:01.731Z"
+    }
+  ],
+  "instructions": [],
+  "nutrition": {
+    "total_nutrition": {
+      "calories": 75,
+      "protein_g": 3,
+      "carbohydrates_g": 9,
+      "fat_g": 3,
+      "fiber_g": 5,
+      "sugar_g": 2,
+      "sodium_mg": 500
+    },
+    "estimated_servings": 1,
+    "per_serving": {
+      "calories": 75,
+      "protein_g": 3,
+      "carbohydrates_g": 9,
+      "fat_g": 3
+    },
+    "daily_values_per_serving": {
+      "protein_percent": 6,
+      "carbs_percent": 3,
+      "fat_percent": 4,
+      "fiber_percent": 16
+    },
+    "health_notes": [
+      "Nutritional values are estimated",
+      "Consult a nutritionist for precise dietary planning"
+    ],
+    "analysis_method": "fallback_estimation"
+  },
+  "tags": [
+    "voice_created"
+  ],
+  "status": "completed",
+  "saved_at": "2025-09-13T00:59:52.623Z"
+}

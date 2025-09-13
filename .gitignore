@@ -74,8 +74,8 @@ logs/
 *.temp
 .tmp/
 
-# User data
-database/users/*/
-database/recipes/*/
-!database/users/.gitkeep
-!database/recipes/.gitkeep
+# User data (commented out to include database structure)
+# database/users/*/
+# database/recipes/*/
+# !database/users/.gitkeep
+# !database/recipes/.gitkeep
