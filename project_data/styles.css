@@ -1,0 +1,197 @@
+:root {
+    --background: 250 250 250;
+    --foreground: 10 10 10;
+    --muted: 245 245 245;
+    --muted-foreground: 115 115 115;
+    --border: 230 230 230;
+    --sage-green: 134 168 131;
+    --sage-green-light: 164 188 161;
+}
+
+.bg-background { background-color: rgb(var(--background)); }
+.text-foreground { color: rgb(var(--foreground)); }
+.text-background { color: rgb(var(--background)); }
+.bg-foreground { background-color: rgb(var(--foreground)); }
+.text-muted-foreground { color: rgb(var(--muted-foreground)); }
+.bg-muted { background-color: rgb(var(--muted)); }
+.border-foreground { border-color: rgb(var(--foreground)); }
+.bg-sage-green { background-color: rgb(var(--sage-green)); }
+.text-sage-green { color: rgb(var(--sage-green)); }
+.border-sage-green { border-color: rgb(var(--sage-green)); }
+.hover\:bg-sage-green:hover { background-color: rgb(var(--sage-green)); }
+.hover\:text-background:hover { color: rgb(var(--background)); }
+
+.hidden { display: none !important; }
+
+
+.sound-wave-1 { animation-delay: 0ms; }
+.sound-wave-2 { animation-delay: 150ms; }
+.sound-wave-3 { animation-delay: 300ms; }
+
+/* Proper cursor blinking animation */
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+.cursor-blink {
+    animation: blink 1s infinite;
+}
+
+/* Console slide animation */
+.console-open {
+    transform: translateX(0) !important;
+}
+
+/* Modal z-index fixes */
+.modal-overlay {
+    z-index: 9999 !important;
+    position: fixed !important;
+}
+
+.modal-content {
+    z-index: 10000 !important;
+    position: relative !important;
+}
+
+/* Ensure views don't interfere with modals */
+.view {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 1;
+}
+
+/* Popup overlay */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.dark {
+  --background: #000;
+  --foreground: #fff;
+  --card: #000;
+  --card-foreground: #fff;
+  --popover: #000;
+  --popover-foreground: #fff;
+  --primary: #fff;
+  --primary-foreground: #000;
+  --secondary: #1a1a1a;
+  --secondary-foreground: #fff;
+  --muted: #262626;
+  --muted-foreground: #a3a3a3;
+  --accent: #262626;
+  --accent-foreground: #fff;
+  --destructive: #fff;
+  --destructive-foreground: #000;
+  --border: #404040;
+  --input: transparent;
+  --input-background: #0a0a0a;
+  --switch-background: #404040;
+  --ring: #fff;
+  --chart-1: #262626;
+  --chart-2: #333;
+  --chart-3: #404040;
+  --chart-4: #666;
+  --chart-5: #999;
+  --sidebar: #000;
+  --sidebar-foreground: #fff;
+  --sidebar-primary: #fff;
+  --sidebar-primary-foreground: #000;
+  --sidebar-accent: #1a1a1a;
+  --sidebar-accent-foreground: #fff;
+  --sidebar-border: #404040;
+  --sidebar-ring: #fff;
+}
+
+/* Base styles matching Figma */
+body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-weight: var(--font-weight-normal);
+    line-height: 1.5;
+}
+
+/* Utility classes */
+.conversation-message {
+    margin-bottom: 1rem;
+}
+
+.conversation-message:last-child {
+    margin-bottom: 0;
+}
+
+/* Add any additional custom styles here */
+
+/* Enhanced cursor blinking animation */
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+.animate-blink {
+    animation: blink 1s infinite;
+}
+
+/* Animations */
+.animate-pulse {
+    animation: blink 1s infinite;
+}
+
+/* Line clamp utilities */
+.line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+}
+
+.line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+}
+
+.line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+}
+
+/* Transitions */
+.transition-colors {
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(.4, 0, .2, 1);
+    transition-duration: .15s;
+}
+
+.transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(.4, 0, .2, 1);
+    transition-duration: .15s;
+}
+
+.duration-300 {
+    transition-duration: 300ms;
+}
+
+.duration-500 {
+    transition-duration: 500ms;
+}

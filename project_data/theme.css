@@ -1,0 +1,232 @@
+/* ============================================================================
+   RECIPE VOICE ASSISTANT - DEDICATED THEME
+   ============================================================================
+   Consistent styling to prevent recurring UI issues
+   ============================================================================ */
+
+/* CSS Variables for consistent theming */
+:root {
+  /* Colors */
+  --color-background: #ffffff;
+  --color-foreground: #0f172a;
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #64748b;
+  --color-border: #e2e8f0;
+  --color-accent: #3b82f6;
+  --color-accent-foreground: #ffffff;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+  
+  /* Success colors */
+  --color-success: #22c55e;
+  --color-success-light: #dcfce7;
+  
+  /* Modal specific */
+  --modal-background: #ffffff;
+  --modal-overlay: rgba(0, 0, 0, 0.5);
+  --modal-border: #e2e8f0;
+  --modal-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  
+  /* Toast specific */
+  --toast-background-success: #22c55e;
+  --toast-background-error: #ef4444;
+  --toast-background-warning: #eab308;
+  --toast-background-info: #3b82f6;
+  --toast-text: #ffffff;
+}
+
+/* Modal Base Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--modal-overlay);
+  backdrop-filter: blur(4px);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: var(--modal-background) !important;
+  border: 1px solid var(--modal-border);
+  border-radius: 8px;
+  box-shadow: var(--modal-shadow);
+  max-width: 28rem;
+  width: 100%;
+  margin: 1rem;
+  padding: 1.5rem;
+  position: relative;
+}
+
+/* Modal Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.modal-close-btn {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--color-muted-foreground);
+}
+
+.modal-close-btn:hover {
+  background-color: var(--color-muted);
+}
+
+/* Modal Content */
+.modal-body {
+  text-align: center;
+}
+
+.modal-icon {
+  width: 4rem;
+  height: 4rem;
+  background-color: var(--color-success-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem auto;
+}
+
+.modal-icon svg {
+  width: 2rem;
+  height: 2rem;
+  color: var(--color-success);
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--color-foreground);
+  margin: 0;
+}
+
+/* Toast Notifications */
+.toast-notification {
+  position: fixed !important;
+  top: 16px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 9999 !important;
+  padding: 12px 24px !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.3s ease !important;
+  opacity: 0 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: var(--toast-text) !important;
+}
+
+.toast-notification.success {
+  background-color: var(--toast-background-success) !important;
+}
+
+.toast-notification.error {
+  background-color: var(--toast-background-error) !important;
+}
+
+.toast-notification.warning {
+  background-color: var(--toast-background-warning) !important;
+}
+
+.toast-notification.info {
+  background-color: var(--toast-background-info) !important;
+}
+
+/* Button Styles */
+.btn-primary {
+  background-color: var(--color-accent);
+  color: var(--color-accent-foreground);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb;
+}
+
+.btn-secondary {
+  background-color: var(--color-muted);
+  color: var(--color-muted-foreground);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-secondary:hover {
+  background-color: #e2e8f0;
+}
+
+/* Utility Classes */
+.hidden {
+  display: none !important;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+.flex {
+  display: flex;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.items-center {
+  align-items: center;
+}
+
+/* Ensure all modals use consistent styling */
+#recipe-completion-modal .modal-content,
+#recipeCompletion .modal-content,
+#recipe-detail-modal .modal-content,
+#confirmation-modal .modal-content,
+#about-modal .modal-content {
+  background-color: var(--modal-background) !important;
+  border: 1px solid var(--modal-border) !important;
+  box-shadow: var(--modal-shadow) !important;
+}
+
+/* Fix any transparent backgrounds */
+.bg-background {
+  background-color: var(--modal-background) !important;
+}
+
+/* Ensure text is visible */
+.text-foreground {
+  color: var(--color-foreground) !important;
+}
+
+.text-muted-foreground {
+  color: var(--color-muted-foreground) !important;
+}
