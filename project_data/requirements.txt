@@ -6,5 +6,4 @@ httpx
 requests
 psutil
 python-multipart
-redis
-aioredis
+# Redis dependencies removed

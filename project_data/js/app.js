@@ -910,15 +910,9 @@ class RecipeVoiceApp {
                     // Handle recipe closure
                     if (resolvedResult.closeRecipe) {
                         console.log('🚪 Closing recipe and returning to main menu');
-                        this.returnToMainMenu();
+                        this.closeRecipe();
                     }
                     
-                    // Handle close recipe action
-                    if (resolvedResult.closeRecipe) {
-                        console.log('🚪 Executing close recipe action');
-                        this.closeRecipe();
-                        return;
-                    }
                     
                     // Only show UI feedback for critical actions, not ingredient additions
                     if (functionCall.name === 'saveRecipe' || functionCall.name === 'closeRecipe' || functionCall.name === 'editIngredient' || functionCall.name === 'removeIngredient') {

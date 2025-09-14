@@ -73,7 +73,7 @@ recipe-maker/
 └── project_data/                  # Application code
     ├── server.py                  # FastAPI backend (459 lines)
     ├── simple_server.py           # Minimal backup server
-    ├── redis_manager.py           # Redis integration
+    ├── (redis_manager.py removed)  # Redis integration removed
     ├── index.html                 # Main UI (793 lines)
     ├── js/                        # Modular JavaScript
     │   ├── app.js                 # Main orchestrator
@@ -140,7 +140,7 @@ idle → waiting_to_start → listening_for_ingredients → finished_recipe → 
 OPENAI_API_KEY=your-openai-api-key
 
 # Optional
-REDIS_URL=redis://localhost:6379
+# REDIS_URL=redis://localhost:6379  # Redis removed
 DEBUG=true
 ```
 

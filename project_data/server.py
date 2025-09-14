@@ -13,7 +13,7 @@ import openai
 from dotenv import load_dotenv
 import requests
 import httpx
-from redis_manager import redis_manager
+# Redis removed - using file-based storage only
 
 # Function to kill process using port 8000
 def kill_process_on_port(port=8000):
@@ -28,14 +28,14 @@ def kill_process_on_port(port=8000):
                             # Skip system processes that don't actually use the port
                             if proc.info['name'] in ['System Idle Process', 'System']:
                                 continue
-                            print(f"🔥 Killing process {proc.info['pid']} ({proc.info['name']}) using port {port}")
+                            print(f"[INFO] Killing process {proc.info['pid']} ({proc.info['name']}) using port {port}")
                             proc.kill()
                             proc.wait(timeout=3)
                             return True
             except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                 pass
     except Exception as e:
-        print(f"❌ Error killing process on port {port}: {e}")
+        print(f"[ERROR] Error killing process on port {port}: {e}")
     return False
 
 # Port cleanup is now handled by start_server.py - remove duplicate check
@@ -130,8 +130,7 @@ async def save_recipe(request: UserRecipeSaveRequest):
         recipe_name = recipe_data.get('name', 'Unnamed Recipe')
         recipe_id = recipe_data.get('id', request.filename.replace('.json', ''))
         
-        # Update Redis with recipe creation
-        await redis_manager.add_recipe_created(request.user, recipe_id, recipe_name)
+        # Recipe creation tracking removed (was Redis-based)
         
         return {"success": True, "message": f"Recipe saved to {file_path}", "user": request.user}
     
@@ -240,20 +239,34 @@ async def delete_recipe(request: RecipeDeleteRequest):
 @app.get("/api/user/{user}/daily")
 async def get_user_daily_data(user: str):
     """Get user's daily calorie and meal data"""
-    try:
-        daily_data = await redis_manager.get_user_daily_data(user)
-        return daily_data
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to get daily data: {str(e)}")
+    # Redis removed - return default daily data
+    return {
+        'date': datetime.now().strftime('%Y-%m-%d'),
+        'calories_budget': 1000,
+        'calories_consumed': 0,
+        'meals': [],
+        'recipes_created': [],
+        'last_updated': datetime.now().isoformat()
+    }
 
 @app.get("/api/user/{user}/profile")
 async def get_user_profile(user: str):
     """Get user's profile and preferences"""
-    try:
-        profile = await redis_manager.get_user_profile(user)
-        return profile
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to get user profile: {str(e)}")
+    # Redis removed - return default profile
+    return {
+        'username': user,
+        'created': datetime.now().isoformat(),
+        'preferences': {
+            'voice': 'ash',
+            'language': 'en',
+            'daily_calorie_goal': 1000
+        },
+        'stats': {
+            'total_recipes': 0,
+            'days_active': 0,
+            'favorite_ingredients': []
+        }
+    }
 
 @app.post("/api/user/{user}/consume-calories")
 async def consume_calories(user: str, request: Request):
@@ -263,8 +276,8 @@ async def consume_calories(user: str, request: Request):
         calories = data.get('calories', 0)
         meal_info = data.get('meal_info', {})
         
-        updated_data = await redis_manager.add_calories_consumed(user, calories, meal_info)
-        return {"success": True, "daily_data": updated_data}
+        # Redis removed - calorie tracking disabled
+        return {"success": True, "message": "Calorie tracking temporarily disabled"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to add calories: {str(e)}")
 
@@ -272,12 +285,11 @@ async def consume_calories(user: str, request: Request):
 async def get_calories_remaining(user: str):
     """Get remaining calories for the day"""
     try:
-        remaining = await redis_manager.get_calories_remaining(user)
-        daily_data = await redis_manager.get_user_daily_data(user)
+        # Redis removed - return default calorie data
         return {
-            "calories_remaining": remaining,
-            "calories_consumed": daily_data['calories_consumed'],
-            "calories_budget": daily_data['calories_budget']
+            "calories_remaining": 1000,
+            "calories_consumed": 0,
+            "calories_budget": 1000
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get calorie data: {str(e)}")
