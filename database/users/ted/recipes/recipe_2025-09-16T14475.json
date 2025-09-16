@@ -1,0 +1,35 @@
+{
+  "id": "recipe_1758034046654_s6nvwcn9o_ezny",
+  "name": "Teeest",
+  "created": "2025-09-16T14:47:26.654Z",
+  "source": "voice_assistant",
+  "metadata": {
+    "duration_seconds": 27,
+    "language": "en",
+    "session_id": "session_1758034046654_4dfrh9sy"
+  },
+  "ingredients": [
+    {
+      "name": "potatoes",
+      "amount": 100,
+      "unit": "grams",
+      "added_at": "2025-09-16T14:47:34.398Z"
+    },
+    {
+      "name": "peppermint",
+      "amount": 50,
+      "unit": "grams",
+      "added_at": "2025-09-16T14:47:49.544Z"
+    }
+  ],
+  "instructions": [],
+  "nutrition": {
+    "estimated_calories": null,
+    "servings": null
+  },
+  "tags": [
+    "voice_created"
+  ],
+  "status": "completed",
+  "saved_at": "2025-09-16T14:47:53.853Z"
+}
